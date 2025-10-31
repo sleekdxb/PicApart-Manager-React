@@ -1,19 +1,18 @@
 import React , {useState} from 'react';
 import { useNavigate } from 'react-router-dom';
-import Sidebar from './Sidebar';
-import GarageManagementNavbar from './GarageManagementNavbar';
-
-import total from "../../assets/images/total.png";
-import arrowup from "../../assets/images/arrowup.png";
-import requestsubmitted from "../../assets/images/active_dealers.png";
-import totalgarages from "../../assets/images/total_garages.png";
-import garageApproval from "../../assets/images/garage_approval.png"
-import checkcircle from "../../assets/images/checkcircle.png";
-import location from "../../assets/images/location.png";
-import phone from "../../assets/images/phone.png";
-import checkcircle2 from "../../assets/images/CheckCircle2.png";
-import quickservice from "../../assets/images/quick service.png";
-import email from "../../assets/images/email.png";
+import Sidebar from '../Sidebar';
+import CommonNavbar from '../../components/CommonNavbar';
+import total from "../../../assets/images/total.png";
+import arrowup from "../../../assets/images/arrowup.png";
+import requestsubmitted from "../../../assets/images/active_dealers.png";
+import totalgarages from "../../../assets/images/total_garages.png";
+import garageApproval from "../../../assets/images/garage_approval.png"
+import checkcircle from "../../../assets/images/checkcircle.png";
+import location from "../../../assets/images/location.png";
+import phone from "../../../assets/images/phone.png";
+import checkcircle2 from "../../../assets/images/CheckCircle2.png";
+import quickservice from "../../../assets/images/quick service.png";
+import email from "../../../assets/images/email.png";
 
 
 export default function GarageManagement(){
@@ -42,7 +41,7 @@ export default function GarageManagement(){
                 />
                 
                 {/* === Navbar with Toggle Button === */}
-                <GarageManagementNavbar collapsed={collapsed} onToggleSidebar={handleToggleSidebar} />
+                <CommonNavbar collapsed={collapsed} onToggleSidebar={handleToggleSidebar} title="Garage Management"/>
           
                 {/* === Main Content === */}
                 
@@ -123,7 +122,7 @@ export default function GarageManagement(){
   </div>
   </div>
 
-  
+
 
 {/* ============= garage approval section ========= */}
   <div className="mt-3 border rounded w-full p-4 shadow bg-white">

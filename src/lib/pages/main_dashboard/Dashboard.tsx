@@ -1,24 +1,24 @@
 import React, { useState } from "react";
-import Sidebar from "./Sidebar";
-import DashboardNavbar from "./DashboardNavbar";
-import liquidityscore from "../../assets/images/liquidityscore.png";
-import arrowup from "../../assets/images/arrowup.png";
-import currency from "../../assets/images/currency.png";
-import activedealers from "../../assets/images/active_dealers.png";
-import chartbar from "../../assets/images/chartbar.png";
-import revenuerisk from "../../assets/images/revenue risk.png";
-import failedpayment from "../../assets/images/failed_payment.png";
-import subscription from "../../assets/images/subscription_ending.png";
-import liquidity from "../../assets/images/liquidity.png";
-import quickactions from "../../assets/images/quick_actions.png";
-import approvedealers from "../../assets/images/UserSwitch.png";
-import number from "../../assets/images/number.png";
-import respondtickets from "../../assets/images/respond_tickets.png";
-import viewalerts from "../../assets/images/view_alerts.png";
-import generatereport from "../../assets/images/generate_report.png";
+import Sidebar from "../Sidebar";
+import liquidityscore from "../../../assets/images/liquidityscore.png";
+import arrowup from "../../../assets/images/arrowup.png";
+import currency from "../../../assets/images/currency.png";
+import activedealers from "../../../assets/images/active_dealers.png";
+import chartbar from "../../../assets/images/chartbar.png";
+import revenuerisk from "../../../assets/images/revenue risk.png";
+import failedpayment from "../../../assets/images/failed_payment.png";
+import subscription from "../../../assets/images/subscription_ending.png";
+import liquidity from "../../../assets/images/liquidity.png";
+import quickactions from "../../../assets/images/quick_actions.png";
+import approvedealers from "../../../assets/images/UserSwitch.png";
+import number from "../../../assets/images/number.png";
+import respondtickets from "../../../assets/images/respond_tickets.png";
+import viewalerts from "../../../assets/images/view_alerts.png";
+import generatereport from "../../../assets/images/generate_report.png";
 
-import EngagementFunnelChart from "../charts/EngagementFunnelChart";
-import SubscriptionHealthChart from "../charts/SubscriptionHealthChart";
+import EngagementFunnelChart from "../../charts/EngagementFunnelChart";
+import SubscriptionHealthChart from "../../charts/SubscriptionHealthChart";
+import CommonNavbar from "../../components/CommonNavbar";
 
 export default function Dashboard() {
   const [collapsed, setCollapsed] = useState(false);
@@ -42,7 +42,7 @@ export default function Dashboard() {
       />
       
       {/* === Navbar with Toggle Button === */}
-      <DashboardNavbar collapsed={collapsed} onToggleSidebar={handleToggleSidebar} />
+      <CommonNavbar collapsed={collapsed} onToggleSidebar={handleToggleSidebar} title="Dashboard Overview" />
 
       {/* === Main Content === */}
       

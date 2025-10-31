@@ -1,15 +1,16 @@
-import React, {useState} from "react";
+import React from "react";
 import searchIcon from '../../assets/images/searchIcon2.png';
 import message from '../../assets/images/message.png';
 import notification from '../../assets/images/notification.png';
 import userprofile from '../../assets/images/user_profile.png';
 
-interface NavbarProps {
+interface CommonNavbarProps {
     onToggleSidebar: () => void;
     collapsed: boolean;
+    title:string;
   }
   
-  export default function SubscriptionsNavbar({ onToggleSidebar, collapsed }: NavbarProps) {
+  export default function CommonNavbar({ onToggleSidebar, collapsed, title }: CommonNavbarProps) {
       return( 
         
   <header
@@ -45,7 +46,7 @@ interface NavbarProps {
 
           <div className="flex flex-col ml-2">
               <h1 className="text-lg font-semibold text-black" >
-              Subscriptions & Billing
+              {title}
               </h1>        
               </div>
               </div>
