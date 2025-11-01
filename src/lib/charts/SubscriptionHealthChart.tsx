@@ -1,4 +1,3 @@
-import React from "react";
 import newmrr from '../../assets/images/new mrr.png';
 import totalmrr from '../../assets/images/total mrr.png';
 import {
