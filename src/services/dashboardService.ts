@@ -15,7 +15,13 @@ export interface DashboardStatisticsDataItem {
   engagement_funnel?: Record<string, number>;
   subscription_health?: Array<{ month: string; total: number }>; // month like '2025-09'
   liquidity_gaps?: Array<{ part_combination: string; total_records: number }>;
-  quick_actions?: { pending_vendors?: number };
+  quick_actions?: {
+    pending_vendors?: number;
+    pending_tickets?: number;
+    pending_alerts?: number;
+    reports_ready?: number;
+    [key: string]: number | undefined;
+  };
 }
 
 export interface DashboardStatisticsResponse {
@@ -44,11 +50,10 @@ export async function fetchDashboardStatistics(payloadItems: DashboardStatistics
       body,
       headers: { Authorization: token ? "Bearer ***" : undefined },
     });
-  } catch {}
+  } catch { }
 
   const response = await authApiClient.post<DashboardStatisticsResponse>(endpoint, body, token ? { headers: { Authorization: `Bearer ${token}` } } : undefined);
-  try { console.log("[Dashboard] Statistics response", response); } catch {}
+  try { console.log("[Dashboard] Statistics response", response); } catch { }
   return response;
 }
-
 
