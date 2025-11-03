@@ -1,17 +1,24 @@
 import React , {useState} from 'react';
 
-import Sidebar from './Sidebar';
-import SubscriptionsNavbar from './SubscriptionsNavbar';
-
-import liquidityscore from "../../assets/images/liquidityscore.png";
-import arrowup from "../../assets/images/arrowup.png";
-import attention from "../../assets/images/revenue risk.png";
-import coupons from "../../assets/images/coupons.png";
-import download from "../../assets/images/download.png";
-import checkcircle from "../../assets/images/checkcircle.png";
-import exporticon from "../../assets/images/export.png";
-import clock from "../../assets/images/Clock.png";
-import trendup from "../../assets/images/TrendUp.png";
+import Sidebar from '../Sidebar';
+import CommonNavbar from '../../components/CommonNavbar';
+import liquidityscore from "../../../assets/images/liquidityscore.png";
+import arrowup from "../../../assets/images/arrowup.png";
+import attention from "../../../assets/images/revenue risk.png";
+import coupons from "../../../assets/images/coupons.png";
+import download from "../../../assets/images/download.png";
+import checkcircle from "../../../assets/images/checkcircle.png";
+import exporticon from "../../../assets/images/export.png";
+import clock from "../../../assets/images/Clock.png";
+import trendup from "../../../assets/images/TrendUp.png";
+import dropdownup from "../../../assets/images/dropdownup.png";
+import dropdowndown from "../../../assets/images/dropdowndown.png";
+import billing from "../../../assets/images/billing.png";
+import editcoupon from "../../../assets/images/edit coupon.png";
+import EditCoupon from './component/modals/EditCoupon';
+import Failedpayments from './component/Failedpayments';
+import Dealercommunication from './component/Dealercommunication';
+import SubscriptionAnalytics from './component/SubscriptionAnalytics';
 
 
 
@@ -75,7 +82,11 @@ interface Client {
      
   ];
 
+  
 export default function Subscriptions(){
+  const [opensubscription, setOpensubscription] = useState(false);
+  const [openBilling, setOpenBilling] = useState(false);
+
     const [collapsed, setCollapsed] = useState(false);
       const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     
@@ -86,6 +97,12 @@ export default function Subscriptions(){
           setCollapsed((prev) => !prev);
         }
       };
+
+      const [isModalOpen, setIsModalOpen] = useState(false);
+
+const handleOpenModal = () => setIsModalOpen(true);
+const handleCloseModal = () => setIsModalOpen(false);
+
     
       return (
         <div className="min-h-screen flex flex-col bg-gray-50">
@@ -97,7 +114,7 @@ export default function Subscriptions(){
           />
           
           {/* === Navbar with Toggle Button === */}
-          <SubscriptionsNavbar collapsed={collapsed} onToggleSidebar={handleToggleSidebar} />
+          <CommonNavbar collapsed={collapsed} onToggleSidebar={handleToggleSidebar} title="Subscriptions & Billing"/>
     
           {/* === Main Content === */}
           
@@ -274,106 +291,142 @@ export default function Subscriptions(){
           </div>
     
     <div className="mt-3 border rounded p-4">
-    <div className="flex items-center justify-between">
+    <div className="flex items-center justify-between" onClick={() => setOpensubscription(!opensubscription)}>
   <div className="flex items-center gap-2">
     <img src={trendup} alt="trend up" className="w-4 h-4"/>
     <h2 className="text-sm font-semibold text-black">Subscription Analytics</h2>
   </div>
-
+  <img
+          src={opensubscription ? dropdownup : dropdowndown}
+          alt="dropdown arrow"
+          className="w-4 h-4 transition-transform duration-200"
+        />
   
 </div>
 
         {/* === divider === */}
         <div className="mt-3  border-b border-[#EBEBEB]"></div>
-
-<div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            {/* ======= card 1 ===== */}
-    <div className="border rounded mt-2 p-2 bg-[#F8FAFC]">
-        <h3 className="text-sm text-black font-semibold">MRR by Plan Type</h3>
-        <div className="flex flex-row  justify-between mt-3 px-3">
-            {/* === Enterprise === */}
-      <h3 className="font-semibold text-sm text-gray-500">Enterprise</h3>
-      <h3 className="font-semibold text-sm text-black">$599.98</h3>
-</div>
-{/* === progress bar === */}
-<div className="w-full bg-gray-300 rounded-full h-2 mt-3 ">
-  <div
-    className="bg-[#3E38DA] h-2 rounded-full"
-    style={{ width: "84%" }}  
-  >   
-  </div>
-      </div>
-
-{/* ===== Professional === */}
-      <div className="flex flex-row  justify-between mt-3 px-3">
-      <h3 className="font-semibold text-sm text-gray-500">Professional</h3>
-      <h3 className="font-semibold text-sm text-black">$149.99</h3>
-</div>
-{/* === progress bar === */}
-<div className="w-full bg-gray-300 rounded-full h-2 mt-3 ">
-  <div
-    className="bg-[#16A34A] h-2 rounded-full"
-    style={{ width: "64%" }}  
-  >   
-  </div>
-      </div>
-
-{/* ======== Basic ======== */}
-      <div className="flex flex-row  justify-between mt-3 px-3">
-      <h3 className="font-semibold text-sm text-gray-500">Basic</h3>
-      <h3 className="font-semibold text-sm text-black">$0.00</h3>
-</div>
-{/* === progress bar === */}
-<div className="w-full bg-gray-300 rounded-full h-2 mt-3 ">
-  <div
-    className="bg-[#16A34A] h-2 rounded-full"
-    style={{ width: "0%" }}  
-  >   
-  </div>
-      </div>
-      </div>
-
-      {/*========= Churn Analysis card ========= */}
-      <div className="border rounded mt-2 p-2 bg-[#F8FAFC]">
-        <h3 className="text-sm text-black font-semibold">Churn Analysis</h3>
-        <div className="flex flex-col items-center mt-2">
-            <h3 className="text-md font-semibold text-[#E60015]">8.5%</h3>
-            <h3 className="mt-2 text-sm font-semibold text-gray-700">Monthly Churn Rate</h3>
-        </div>
-        {/* === divider === */}
-        <div className="mt-3  border-b border-[#EBEBEB]"></div>
-        <div className="flex flex col justify-between">
-            <h3 className="text-sm text-gray-700">Last 30 days:</h3>
-            <h3 className="text-sm text-black">3 cancellations</h3>
-        </div>
-        <div className="flex flex col justify-between mt-3">
-            <h3 className="text-sm text-gray-700">Previous period:</h3>
-            <h3 className="text-sm text-black">2 cancellations</h3>
-        </div>
-
-</div>
-{/* ========== Upgrade/Downgrade Patterns ======== */}
-<div className="border rounded mt-2 p-2 bg-[#F8FAFC]">
-      <h3 className="text-sm text-black font-semibold">Upgrade/Downgrade Patterns</h3>
-      <div className="flex flex col justify-between mt-3">
-            <h3 className="text-sm text-gray-700">Upgrades</h3>
-            <h3 className="text-sm text-[#16A34A]">15.2%</h3>
-        </div>
-        <h3 className="text-sm text-gray-700 font-semibold mt-3">5 customers upgraded this month</h3>
         
-      {/* ==== divider === */}
-      <div className="mt-3  border-b border-[#EBEBEB]"></div>
-      <div className="flex flex col justify-between mt-3">
-            <h3 className="text-sm text-gray-700">Downgrades</h3>
-            <h3 className="text-sm text-[#EA580C]">3.2%</h3>
-        </div>
-        <h3 className="text-sm text-gray-700 font-semibold mt-3">1 customer downgraded this month</h3>
-      </div>
-      </div>
-      
+{opensubscription && (
+  <SubscriptionAnalytics/>
+
+)}
+  
     </div>
 
+
+{/* ======== Billing Management ========= */}
+
+    <div className="mt-3 border rounded p-4">
+    <div className="flex items-center justify-between" onClick={() => setOpenBilling(!openBilling)}>
+  <div className="flex items-center gap-2">
+    <img src={billing} alt="billing" className="w-4 h-4"/>
+    <h2 className="text-sm font-semibold text-black">Billing Management</h2>
+  </div>
+  <img
+          src={openBilling ? dropdownup : dropdowndown}
+          alt="dropdown arrow"
+          className="w-4 h-4 transition-transform duration-200"
+        />
+  
+</div>
+
+        {/* === divider === */}
+        <div className="mt-3  border-b border-[#EBEBEB]"></div>
+        {openBilling && (
+          <>
+  
+  {/* ===== failed payments =======*/}
+<Failedpayments />
+
+
+{/* ========== Dealer Communication Log ========= */}
+<Dealercommunication/>
+
+{/* ===== Coupons & Discounts ==== */}
+<div className="flex items-center gap-2 mt-4">
+    <img src={coupons} alt="coupons" className="w-4 h-4"/>
+    <h2 className="text-sm font-semibold text-black">Coupons & Discounts</h2>   
+  </div>
+
+  {/* ======== WELCOME50 ======= */}
+  <div className="border rounded mt-3  p-4 gap-3 bg-[#faf5ff]">
+    <div className="flex flex-row items-center gap-3 justify-between">
+      <div className="flex flex-row items-center gap-2">
+      <h3 className="text-sm text-black ">WELCOME50</h3>
+      <h3 className="text-sm text-[#028174] bg-[#CAFFDC] p-2 border rounded">active</h3>
+      </div>
+
+<div className="flex flex-row items-center ">
+      <button onClick={handleOpenModal}
+      className=" flex items-center gap-2 text-sm text-white px-3 py-2 bg-[#9333EA] border rounded">
+      <img src={editcoupon} alt="edit coupon" className="w-4 h-4" />
+      Edit</button>
+    </div>
+    
+
+    </div>
+    <h3 className="mt-2 text-gray-700">50% off first month</h3>
+    <div className="flex flex-row gap-4 mt-2">
+<h3 className=" text-gray-700">Usage:45/100</h3>
+<h3 className="text-gray-500">Expires:31/12/2025</h3>
+</div>
+</div>
+
+{/* ======== UPGRADE20 ===== */}
+<div className="border rounded mt-3  p-4 gap-3 bg-[#faf5ff]">
+    <div className="flex flex-row items-center gap-3 justify-between">
+      <div className="flex flex-row items-center gap-2">
+      <h3 className="text-sm text-black ">UPGRADE20</h3>
+      <h3 className="text-sm text-[#028174] bg-[#CAFFDC] p-2 border rounded">active</h3>
+      </div>
+
+<div className="flex flex-row items-center ">
+      <button className=" flex items-center gap-2 text-sm text-white px-3 py-2 bg-[#9333EA] border rounded">
+      <img src={editcoupon} alt="edit coupon" className="w-4 h-4" />
+      Edit</button>
+    </div>
+    
+
+    </div>
+    <h3 className="mt-2 text-gray-700">20% off upgrade</h3>
+    <div className="flex flex-row gap-4 mt-2">
+<h3 className=" text-gray-700">Usage:23/50</h3>
+<h3 className="text-gray-500">Expires:30/11/2025</h3>
+</div>
+</div>
+
+{/* ======== SUMMER2024 ======== */}
+<div className="border rounded mt-3  p-4 gap-3 bg-[#ecf3fe]">
+    <div className="flex flex-row items-center gap-3 justify-between">
+      <div className="flex flex-row items-center gap-2">
+      <h3 className="text-sm text-black ">SUMMER2024 </h3>
+      <h3 className="text-sm text-black bg-[#F3F4F6] p-2 border rounded">expired</h3>
+      </div>
+    </div>
+
+    <h3 className="mt-2 text-gray-700">30% off</h3>
+    <div className="flex flex-row gap-4 mt-2">
+<h3 className=" text-gray-700">Usage:100/100</h3>
+<h3 className="text-gray-500">Expires:30/09/2024</h3>
+</div>
+</div>
+
+<div className="flex-1 pr-0 md:pr-6 md:border-gray-300 mt-2">
+      <div className="border-2 border-dashed border-gray-300 rounded-lg h-20 flex flex-col items-center justify-center">
+        <span className="text-gray-700">
+        + Create New Coupon </span>
+      </div>
+      </div>
+
+</>
+        )}
+</div>
+
+
           </main>
+          {isModalOpen && <EditCoupon onClose={handleCloseModal} />}
+
           </div>
       )
 }

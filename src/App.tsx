@@ -1,11 +1,11 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Dashboard from "./lib/pages/Dashboard";
-import DealerManagement from "./lib/pages/DealerManagement";
-import TopDealers from "./lib/pages/TopDealers";
-import AccountOwner from "./lib/pages/AccountOwner";
-import GarageManagement from "./lib/pages/GarageManagement";
-import GarageProfile from "./lib/pages/GarageProfile";
-import Subscriptions from "./lib/pages/Subscriptions";
+import Dashboard from "./lib/pages/main_dashboard/Dashboard";
+import DealerManagement from "./lib/pages/dealer_management/DealerManagement";
+import TopDealers from "./lib/pages/dealer_management/TopDealers";
+import AccountOwner from "./lib/pages/dealer_management/AccountOwner";
+import GarageManagement from "./lib/pages/garage_management/GarageManagement";
+import GarageProfile from "./lib/pages/garage_management/GarageProfile";
+import Subscriptions from "./lib/pages/subscriptions_dashboard/Subscriptions";
 
 export default function App() {
   return (
