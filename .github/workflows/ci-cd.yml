@@ -1,0 +1,80 @@
+name: React Frontend CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - init-Charity
+      - init-Farazdaq
+      - init-Jahanzeb
+      - main
+#so done
+jobs:
+  # ----------------------------
+  # CI Job: Runs on all branches
+  # ----------------------------
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test -- --watchAll=false
+
+      - name: Build project
+        if: github.ref == 'refs/heads/main'
+        run: npm run build
+
+  # ----------------------------
+  # CD Job: Runs only on main
+  # ----------------------------
+  cd:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    needs: ci
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "22.2.0"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build React app
+        run: npm run build
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY_FRONT_MANAGER }}
+
+      - name: Clean and Deploy dist/ folder to server
+        run: |
+          echo "🚀 Cleaning old deployment and uploading new build..."
+
+          ssh -p 65002 -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER_FRONT_MANAGER }}@${{ secrets.SERVER_HOST_FRONT_MANAGER }} << 'ENDSSH'
+          DEPLOY_DIR=~/public_html/canada
+          echo "🧹 Removing existing files in $DEPLOY_DIR..."
+          rm -rf "$DEPLOY_DIR"/*
+          echo "✅ Cleaned."
+          ENDSSH
+
+
+          echo "📤 Uploading dist/ folder via rsync..."
+          rsync -avz -e "ssh -p 65002 -o StrictHostKeyChecking=no" \
+            dist/ ${{ secrets.SERVER_USER_FRONT_MANAGER }}@${{ secrets.SERVER_HOST_FRONT_MANAGER }}:~/public_html/canada
+
+          echo "✅ Deployment completed!"

@@ -13,16 +13,21 @@ export default function App() {
       <Routes>
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/dealer-management" element={<DealerManagement />} />
-        <Route path="/garage-management" element={<GarageManagement/>} />
-        <Route path="/subscriptions" element={<Subscriptions/>} />
+        <Route path="/garage-management" element={<GarageManagement />} />
+        <Route path="/subscriptions" element={<Subscriptions />} />
 
         <Route path="/dealer-management/TopDealers" element={<TopDealers />} />
-        <Route path="/dealer-management/AccountOwner" element={<AccountOwner />} />
-        <Route path="/garage-management/GarageProfile" element={<GarageProfile />} />
+        <Route
+          path="/dealer-management/AccountOwner"
+          element={<AccountOwner />}
+        />
+        <Route
+          path="/garage-management/GarageProfile"
+          element={<GarageProfile />}
+        />
         {/* Fallback */}
         <Route path="*" element={<div>Page Not Found</div>} />
       </Routes>
     </BrowserRouter>
   );
 }
-
