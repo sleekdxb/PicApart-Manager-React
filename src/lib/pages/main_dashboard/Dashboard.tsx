@@ -47,13 +47,82 @@ export default function Dashboard() {
   const [error, setError] = useState<string | null>(null);
   const [stats, setStats] = useState<DashboardStatisticsDataItem | null>(null);
 
-  const parseQuickActionCount = (value?: number) => (typeof value === "number" && Number.isFinite(value) ? value : 0);
+  const coerceMetricValue = (value?: number) => (typeof value === "number" && Number.isFinite(value) ? Math.max(0, value) : 0);
   const quickActionCounts = {
-    approveDealers: parseQuickActionCount(stats?.quick_actions?.pending_vendors),
-    respondTickets: parseQuickActionCount(stats?.quick_actions?.pending_tickets),
-    viewAlerts: parseQuickActionCount(stats?.quick_actions?.pending_alerts),
-    generateReport: parseQuickActionCount(stats?.quick_actions?.reports_ready),
+    approveDealers: coerceMetricValue(stats?.quick_actions?.pending_vendors),
+    respondTickets: coerceMetricValue(stats?.quick_actions?.pending_tickets),
+    viewAlerts: coerceMetricValue(stats?.quick_actions?.pending_alerts),
+    generateReport: coerceMetricValue(stats?.quick_actions?.reports_ready),
   };
+
+  const normalizeStageKey = (raw: string) =>
+    raw
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, "_")
+      .replace(/^_+|_+$/g, "");
+
+  const engagementFunnelStages: Array<{ label: string; keys: string[] }> = [
+    { label: "Request Part", keys: ["request_part", "requestpart", "requests", "request"] },
+    { label: "Notified", keys: ["notified"] },
+    { label: "Part Click", keys: ["part_click", "partclick", "clicks", "click"] },
+    { label: "Contacts", keys: ["contacts", "contact"] },
+  ];
+
+  const formatStageLabel = (raw: string) =>
+    raw
+      .split(/[_\s]+/)
+      .map((segment) => (segment ? `${segment.charAt(0).toUpperCase()}${segment.slice(1)}` : segment))
+      .join(" ");
+
+  const engagementFunnelEntries = stats?.engagement_funnel ?? {};
+  const normalizedEngagementEntries: Record<string, number> = {};
+  Object.entries(engagementFunnelEntries).forEach(([rawKey, rawValue]) => {
+    const normalizedKey = normalizeStageKey(rawKey);
+    if (!normalizedKey) return;
+    normalizedEngagementEntries[normalizedKey] = coerceMetricValue(rawValue as number);
+  });
+
+  const usedEngagementKeys = new Set<string>();
+  const engagementFunnelPrimary = engagementFunnelStages.map(({ label, keys }) => {
+    const normalizedKeys = keys.map(normalizeStageKey);
+    const matchedKey = normalizedKeys.find((normalizedKey) => normalizedEngagementEntries[normalizedKey] !== undefined);
+    if (matchedKey) usedEngagementKeys.add(matchedKey);
+    return {
+      stage: label,
+      value: matchedKey ? normalizedEngagementEntries[matchedKey] : 0,
+    };
+  });
+
+  const engagementFunnelExtra = Object.entries(normalizedEngagementEntries)
+    .filter(([key]) => !usedEngagementKeys.has(key))
+    .map(([key, value]) => ({
+      stage: formatStageLabel(key),
+      value,
+    }));
+
+  const engagementFunnelData = [...engagementFunnelPrimary, ...engagementFunnelExtra];
+  const hasEngagementData = engagementFunnelData.some((item) => item.value > 0);
+
+  const subscriptionHealthData = (stats?.subscription_health ?? [])
+    .map((item) => {
+      const month = item?.month;
+      const total = coerceMetricValue(item?.total);
+      if (!month) {
+        return { month: "N/A", total, order: Number.POSITIVE_INFINITY };
+      }
+
+      const parsedDate = new Date(`${month}-01T00:00:00`);
+      if (!Number.isFinite(parsedDate.getTime())) {
+        return { month, total, order: Number.POSITIVE_INFINITY };
+      }
+
+      const formatter = new Intl.DateTimeFormat("en", { month: "short" });
+      const label = `${formatter.format(parsedDate)} ${String(parsedDate.getFullYear()).slice(-2)}`;
+      return { month: label, total, order: parsedDate.getTime() };
+    })
+    .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+    .map(({ month, total }) => ({ month, total }));
 
   const handleToggleSidebar = () => {
     if (window.innerWidth < 768) {
@@ -186,10 +255,10 @@ export default function Dashboard() {
         {/* === charts section ==========*/}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
           <div className=" mt-3 gap-3">
-            <EngagementFunnelChart />
+            <EngagementFunnelChart data={hasEngagementData ? engagementFunnelData : undefined} />
           </div>
           <div className=" mt-3">
-            <SubscriptionHealthChart />
+            <SubscriptionHealthChart data={subscriptionHealthData} />
           </div>
         </div>
 
@@ -234,13 +303,23 @@ export default function Dashboard() {
               if (!gaps.length) {
                 return <div className="text-sm text-gray-600 mt-3 px-3">No gaps</div>;
               }
-              const maxRecords = Math.max(...gaps.map(g => Math.max(1, g.total_records || 0)), 1);
-              return gaps.slice(0, 5).map((g, idx) => {
-                const pct = Math.round(((g.total_records || 0) / maxRecords) * 100);
-                return (
-                  <DemandGapItem key={`${g.part_combination}-${idx}`} title={g.part_combination} percentage={pct} displayValue={g.total_records || 0} displaySuffix="records" />
-                );
-              });
+              const maxRecords = Math.max(...gaps.map((g) => Math.max(1, g.total_records || 0)), 1);
+              return (
+                <div className="mt-3 max-h-56 overflow-y-auto pr-1">
+                  {gaps.map((g, idx) => {
+                    const pct = Math.round(((g.total_records || 0) / maxRecords) * 100);
+                    return (
+                      <DemandGapItem
+                        key={`${g.part_combination}-${idx}`}
+                        title={g.part_combination}
+                        percentage={pct}
+                        displayValue={g.total_records || 0}
+                        displaySuffix="records"
+                      />
+                    );
+                  })}
+                </div>
+              );
             })()}
           </div>
 
@@ -252,7 +331,7 @@ export default function Dashboard() {
             </div>
 
             <div className="grid grid-col-1 md:grid-cols-2 gap-2">
-              <QuickActionItem title="Pending Dealers" iconSrc={approvedealers} count={quickActionCounts.approveDealers} />
+              <QuickActionItem title="Approve Dealers" iconSrc={approvedealers} count={quickActionCounts.approveDealers} />
               <QuickActionItem title="Respond Tickets" iconSrc={respondtickets} count={quickActionCounts.respondTickets} />
               <QuickActionItem title="View Alerts" iconSrc={viewalerts} count={quickActionCounts.viewAlerts} />
               <QuickActionItem title="Generate Report" iconSrc={generatereport} count={quickActionCounts.generateReport} />

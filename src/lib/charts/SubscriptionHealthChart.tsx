@@ -1,32 +1,43 @@
-import newmrr from '../../assets/images/new mrr.png';
 import totalmrr from '../../assets/images/total mrr.png';
-import {
-  ComposedChart,
-  Area,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
+import { ComposedChart, Area, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
-const data = [
-  { month: "Jan", newMRR: 380, total: 380 },
-  { month: "Feb", newMRR: 400, total: 550 },
-  { month: "Mar", newMRR: 550, total: 580 },
-  { month: "Apr", newMRR: 580, total: 600 },
-  { month: "May", newMRR: 640, total: 680 },
-  { month: "June", newMRR: 720, total: 740 },
-  { month: "July", newMRR: 760, total: 780 },
-  { month: "Aug", newMRR: 800, total: 860 },
-  { month: "Sept", newMRR: 900, total: 940 },
-  { month: "Oct", newMRR: 990, total: 1030 },
-  { month: "Nov", newMRR: 1060, total: 1100 },
-  { month: "Dec", newMRR: 1130, total: 1180 },
+type SubscriptionHealthPoint = {
+  month: string;
+  total: number;
+};
+
+const fallbackData: SubscriptionHealthPoint[] = [
+  { month: "Jan", total: 380 },
+  { month: "Feb", total: 550 },
+  { month: "Mar", total: 580 },
+  { month: "Apr", total: 600 },
+  { month: "May", total: 680 },
+  { month: "Jun", total: 740 },
+  { month: "Jul", total: 780 },
+  { month: "Aug", total: 860 },
+  { month: "Sep", total: 940 },
+  { month: "Oct", total: 1030 },
+  { month: "Nov", total: 1100 },
+  { month: "Dec", total: 1180 },
 ];
 
-export default function SubscriptionHealthChart() {
+interface SubscriptionHealthChartProps {
+  data?: SubscriptionHealthPoint[];
+}
+
+export default function SubscriptionHealthChart({ data }: SubscriptionHealthChartProps) {
+  const chartData = (data?.length ? data : fallbackData).map((entry) => ({
+    ...entry,
+    monthLabel: entry.month,
+  }));
+
+  const totals = chartData.map((pt) => pt.total).filter((value) => Number.isFinite(value));
+  const minTotal = totals.length ? Math.min(...totals) : 0;
+  const maxTotal = totals.length ? Math.max(...totals) : 1000;
+  const yPadding = totals.length ? Math.max(20, Math.round((maxTotal - minTotal) * 0.1)) : 200;
+  const domainMin = Math.max(0, Math.floor((minTotal - yPadding) / 10) * 10);
+  const domainMax = Math.ceil((maxTotal + yPadding) / 10) * 10 || 1000;
+
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 w-full h-80">
       {/* === Header === */}
@@ -50,7 +61,7 @@ export default function SubscriptionHealthChart() {
       {/* === Chart === */}
       <ResponsiveContainer width="100%" height="90%">
         <ComposedChart
-          data={data}
+          data={chartData}
           margin={{ top: 10, right: 30, left: 20, bottom: 0 }}
           barCategoryGap="30%"
         >
@@ -70,7 +81,7 @@ export default function SubscriptionHealthChart() {
 
           {/* === X Axis === */}
           <XAxis
-            dataKey="month"
+            dataKey="monthLabel"
             tick={{ fontSize: 12, fill: "#6B7280" }}
             axisLine={false}
             tickLine={false}
@@ -83,11 +94,11 @@ export default function SubscriptionHealthChart() {
             tick={{ fontSize: 12, fill: "#6B7280" }}
             axisLine={false}
             tickLine={false}
-            domain={[300, 1200]}
-            ticks={[400, 600, 800, 1000, 1200]}
+            domain={[domainMin, domainMax]}
+            allowDecimals={false}
           >
             <g transform="translate(20, 100)">
-              <image href={newmrr} width={10} height={10} />
+              <image href={totalmrr} width={10} height={10} />
               <text
                 x={10}
                 y={35}
@@ -96,25 +107,10 @@ export default function SubscriptionHealthChart() {
                 fontSize={10}
                 transform="rotate(-90 10 35)"
               >
-                New MRR
+                Total
               </text>
             </g>
           </YAxis>
-
-          {/* === Total MRR Label on Right === */}
-          <g transform="translate(410, 130)">
-            <image href={totalmrr} x={-2} y={-25} width={10} height={10} />
-            <text
-              x={2}
-              y={10}
-              textAnchor="middle"
-              fill="#000"
-              fontSize={10}
-              transform="rotate(90 2 10)"
-            >
-              Total MRR
-            </text>
-          </g>
 
           {/* === Tooltip === */}
           <Tooltip
@@ -129,7 +125,7 @@ export default function SubscriptionHealthChart() {
           {/* === Bars === */}
           <Bar
             yAxisId="left"
-            dataKey="newMRR"
+            dataKey="total"
             barSize={18}
             radius={[4, 4, 0, 0]}
             fill="url(#barGradient)"
@@ -152,4 +148,3 @@ export default function SubscriptionHealthChart() {
     </div>
   );
 }
-

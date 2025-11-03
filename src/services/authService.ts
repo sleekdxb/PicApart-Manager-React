@@ -45,63 +45,63 @@ export interface StaffLogoutResponse {
 const AUTH_STORAGE_KEY = "staffAuth";
 const AUTH_TOKEN_KEY = "authToken";
 
+export async function loginStaff(payload: StaffLoginPayload): Promise<StaffLoginResponse> {
+  const endpoint = "/public/api/staff-login";
+  try {
+    console.log("[Auth] Staff login request", {
+      method: "POST",
+      url: buildApiUrl(endpoint),
+      payload: { work_email: payload.work_email, password: "***" },
+    });
+  } catch { }
+
+  const response = await authApiClient.post<StaffLoginResponse>(endpoint, payload);
+
+  try {
+    console.log("[Auth] Staff login response", response);
+  } catch { }
+
+  return response;
+}
+
+
 // export async function loginStaff(payload: StaffLoginPayload): Promise<StaffLoginResponse> {
-//   const endpoint = "/public/api/staff-login";
+//   // Direct endpoint (temporary, bypassing buildApiUrl)
+//   const endpoint = "http://api-magangment-service.pick-a-part.ca/public/api/staff-login";
+
+//   // Replace <> with your actual Bearer token or keep empty if not required
+//   const token = "<>";
+
 //   try {
-//     console.log("[Auth] Staff login request", {
+//     console.log("[Auth] Staff login request (direct)", {
 //       method: "POST",
-//       url: buildApiUrl(endpoint),
+//       url: endpoint,
+//       headers: {
+//         "Content-Type": "application/json",
+//         Authorization: `Bearer ${token}`,
+//       },
 //       payload: { work_email: payload.work_email, password: "***" },
 //     });
 //   } catch {}
 
-//   const response = await authApiClient.post<StaffLoginResponse>(endpoint, payload);
+//   // Make POST request with the exact same headers
+//   const response = await authApiClient.post<StaffLoginResponse>(
+//     endpoint,
+//     payload,
+//     {
+//       headers: {
+//         "Content-Type": "application/json",
+//         Authorization: `Bearer ${token}`,
+//       },
+//     }
+//   );
 
 //   try {
-//     console.log("[Auth] Staff login response", response);
+//     console.log("[Auth] Staff login response (direct)", response);
 //   } catch {}
 
 //   return response;
 // }
-
-
-export async function loginStaff(payload: StaffLoginPayload): Promise<StaffLoginResponse> {
-  // Direct endpoint (temporary, bypassing buildApiUrl)
-  const endpoint = "http://api-magangment-service.pick-a-part.ca/public/api/staff-login";
-
-  // Replace <> with your actual Bearer token or keep empty if not required
-  const token = "<>";
-
-  try {
-    console.log("[Auth] Staff login request (direct)", {
-      method: "POST",
-      url: endpoint,
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      payload: { work_email: payload.work_email, password: "***" },
-    });
-  } catch {}
-
-  // Make POST request with the exact same headers
-  const response = await authApiClient.post<StaffLoginResponse>(
-    endpoint,
-    payload,
-    {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
-
-  try {
-    console.log("[Auth] Staff login response (direct)", response);
-  } catch {}
-
-  return response;
-}
 
 
 
@@ -121,23 +121,23 @@ export async function logoutStaff(): Promise<StaffLogoutResponse> {
       url: buildApiUrl(endpoint),
       headers: { Authorization: token ? "Bearer ***" : undefined },
     });
-  } catch {}
+  } catch { }
 
   const response = await authApiClient.post<StaffLogoutResponse>(
     endpoint,
     undefined,
     token
       ? {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
       : undefined
   );
 
   try {
     console.log("[Auth] Staff logout response", response);
-  } catch {}
+  } catch { }
 
   return response;
 }
