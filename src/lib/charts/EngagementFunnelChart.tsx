@@ -1,23 +1,30 @@
-import React from "react";
-import {
-  XAxis,
-  YAxis,
-  Tooltip,
-  CartesianGrid,
-  ResponsiveContainer,
-  Area,
-  AreaChart,
-} from "recharts";
+import { XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer, Area, AreaChart, LabelList } from "recharts";
 
-const data = [
-    { stage: "Requests",stagevalue:1000, value: 1200 },
-    { stage: "Notified", stagevalue:900,value: 1000 },
-    { stage: "Clicks", stagevalue:800,value: 920 },
-    { stage: "Contacts", stagevalue:430,value: 720 },
-  ];
+type EngagementFunnelPoint = {
+  stage: string;
+  value: number;
+};
 
+const fallbackData: EngagementFunnelPoint[] = [
+  { stage: "Requests", value: 1200 },
+  { stage: "Notified", value: 1000 },
+  { stage: "Clicks", value: 920 },
+  { stage: "Contacts", value: 720 },
+];
 
-export default function EngagementFunnelChart() {
+interface EngagementFunnelChartProps {
+  data?: EngagementFunnelPoint[];
+}
+
+export default function EngagementFunnelChart({ data }: EngagementFunnelChartProps) {
+  const chartData = data?.length ? data : fallbackData;
+  const values = chartData.map((point) => point.value).filter((val) => Number.isFinite(val));
+  const minValue = values.length ? Math.min(...values) : 0;
+  const maxValue = values.length ? Math.max(...values) : 1000;
+  const padding = values.length ? Math.max(10, Math.round((maxValue - minValue) * 0.1)) : 200;
+  const domainMin = Math.max(0, Math.floor((minValue - padding) / 10) * 10);
+  const domainMax = Math.ceil((maxValue + padding) / 10) * 10 || 1000;
+
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 w-full h-80">
       {/* === Title Section === */}
@@ -42,7 +49,7 @@ export default function EngagementFunnelChart() {
       <div className="h-[90%] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart
-            data={data}
+            data={chartData}
             margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
           >
             <defs>
@@ -66,8 +73,8 @@ export default function EngagementFunnelChart() {
             />
 
             <YAxis
-              domain={[400, 1200]}
-              ticks={[400, 600, 800, 1000, 1200]}
+              domain={[domainMin, domainMax]}
+              allowDecimals={false}
               tick={{ fontSize: 12, fill: "#6B7280" }}
               axisLine={false}
               tickLine={false}
@@ -91,7 +98,14 @@ export default function EngagementFunnelChart() {
               fillOpacity={1}
               fill="url(#funnelGradient)"
               activeDot={{ r: 5, fill: "#16A34A" }}
-            />
+            >
+              <LabelList
+                dataKey="value"
+                position="top"
+                style={{ fill: "#1F2937", fontSize: 12, fontWeight: 600 }}
+                formatter={(val: unknown) => (typeof val === "number" ? val.toString() : "")}
+              />
+            </Area>
           </AreaChart>
         </ResponsiveContainer>
       </div>

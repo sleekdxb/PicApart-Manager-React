@@ -11,6 +11,8 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/dealer-management" element={<DealerManagement />} />
         <Route path="/garage-management" element={<GarageManagement />} />
