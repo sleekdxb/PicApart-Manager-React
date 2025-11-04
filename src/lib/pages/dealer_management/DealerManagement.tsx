@@ -1,9 +1,8 @@
 import React, {useState} from 'react';
  import {useNavigate} from "react-router-dom";
-import Sidebar from './Sidebar';
-import DealerManagementNavbar from './DealerManagementNavbar';
-
-import eyeIcon from "../../assets/images/Eye.png";
+import Sidebar from '../Sidebar';
+import CommonNavbar from '../../components/CommonNavbar';
+import eyeIcon from "../../../assets/images/Eye.png";
 
 
 interface Client {
@@ -132,7 +131,7 @@ const handleViewAccountOwner =() => {
       />
       
       {/* === Navbar with Toggle Button === */}
-      <DealerManagementNavbar collapsed={collapsed} onToggleSidebar={handleToggleSidebar} />
+      <CommonNavbar collapsed={collapsed} onToggleSidebar={handleToggleSidebar} title="Dealer Management"/>
 
       {/* === Main Content === */}
       

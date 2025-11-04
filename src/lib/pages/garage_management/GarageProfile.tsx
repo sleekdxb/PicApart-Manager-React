@@ -1,14 +1,14 @@
 import React, {useState} from 'react';
 import { useNavigate } from 'react-router-dom';
-import Sidebar from './Sidebar';
-import GarageManagementNavbar from './GarageManagementNavbar';
+import Sidebar from '../Sidebar';
+import CommonNavbar from '../../components/CommonNavbar';
 
-import johnsmith from "../../assets/images/John Smith.png";
-import pdf from "../../assets/images/pdf.png";
-import requests from "../../assets/images/requests.png";
-import listingclicks from "../../assets/images/listing clicks.png";
-import calls from "../../assets/images/calls.png";
-import chat from "../../assets/images/Chat.png";
+import johnsmith from "../../../assets/images/John Smith.png";
+import pdf from "../../../assets/images/pdf.png";
+import requests from "../../../assets/images/requests.png";
+import listingclicks from "../../../assets/images/listing clicks.png";
+import calls from "../../../assets/images/calls.png";
+import chat from "../../../assets/images/Chat.png";
 
 export default function GarageProfile(){
 const navigate = useNavigate();
@@ -38,7 +38,7 @@ const handleToggleSidebar = () => {
              />
              
              {/* === Navbar with Toggle Button === */}
-             <GarageManagementNavbar collapsed={collapsed} onToggleSidebar={handleToggleSidebar} />
+             <CommonNavbar collapsed={collapsed} onToggleSidebar={handleToggleSidebar} title='Garage Management' />
        
              {/* === Main Content === */}
              

@@ -1,10 +1,10 @@
 import React, {useState} from 'react';
 import { useNavigate } from 'react-router-dom';
-import Sidebar from './Sidebar';
-import DealerManagementNavbar from './DealerManagementNavbar';
+import Sidebar from '../Sidebar';
+import CommonNavbar from '../../components/CommonNavbar';
 
-import johnsmith from "../../assets/images/John Smith.png";
-import pdf from "../../assets/images/pdf.png";
+import johnsmith from "../../../assets/images/John Smith.png";
+import pdf from "../../../assets/images/pdf.png";
 
 export default function AccountOwner(){
 const navigate=useNavigate();
@@ -34,7 +34,7 @@ const handleToggleSidebar = () => {
              />
              
              {/* === Navbar with Toggle Button === */}
-             <DealerManagementNavbar collapsed={collapsed} onToggleSidebar={handleToggleSidebar} />
+             <CommonNavbar collapsed={collapsed} onToggleSidebar={handleToggleSidebar} title="Dealer Management" />
        
              {/* === Main Content === */}
              
