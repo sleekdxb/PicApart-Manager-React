@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import logo from "../../../assets/images/logo.png";
 import { loginStaff, persistAuth } from "../../../services/authService";
 void loginStaff; void persistAuth; // keep imports while API is temporarily disabled
@@ -12,7 +12,7 @@ export default function Login() {
   const [error, setError] = useState<string | null>(null);
   void setLoading; void setError; // silence unused while API is disabled
 
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     // TEMP: Bypass login API due to issues. Route directly to dashboard.
     // navigate("/dashboard");

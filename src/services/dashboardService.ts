@@ -9,9 +9,12 @@ export interface DashboardStatisticsRequestItem {
 export interface DashboardStatisticsDataItem {
   staff_id: string;
   total_listings: number;
+  total_tyres?: number;
   active_vendors: number;
+  approved_vendors_last4months?: number;
   mrr: number;
   arppd: number;
+  quarter_arppd?: number;
   engagement_funnel?: Record<string, number>;
   subscription_health?: Array<{ month: string; total: number }>; // month like '2025-09'
   liquidity_gaps?: Array<{ part_combination: string; total_records: number }>;
@@ -56,4 +59,3 @@ export async function fetchDashboardStatistics(payloadItems: DashboardStatistics
   try { console.log("[Dashboard] Statistics response", response); } catch { }
   return response;
 }
-

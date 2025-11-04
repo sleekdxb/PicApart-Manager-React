@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import Sidebar from "../../../components/Sidebar";
 import CommonNavbar from "../../../components/CommonNavbar";
 import liquidityscore from "../../../assets/images/liquidityscore.png";
-import arrowup from "../../../assets/images/arrowup.png";
 import currency from "../../../assets/images/currency.png";
 import activedealers from "../../../assets/images/active_dealers.png";
 import chartbar from "../../../assets/images/chartbar.png";
@@ -47,13 +46,34 @@ export default function Dashboard() {
   const [error, setError] = useState<string | null>(null);
   const [stats, setStats] = useState<DashboardStatisticsDataItem | null>(null);
 
-  const coerceMetricValue = (value?: number) => (typeof value === "number" && Number.isFinite(value) ? Math.max(0, value) : 0);
+  const coerceMetricValue = (value?: number | string) => {
+    const numericValue = typeof value === "string" ? Number(value) : value;
+    return typeof numericValue === "number" && Number.isFinite(numericValue) ? Math.max(0, numericValue) : 0;
+  };
+  const getFlexibleStatValue = (item: DashboardStatisticsDataItem | null, key: string) => {
+    if (!item) return undefined;
+    const loose = item as unknown as Record<string, number | string | undefined>;
+    return loose[key];
+  };
+  const hasNumericValue = (value?: number | string) => {
+    const numericValue = typeof value === "string" ? Number(value) : value;
+    return typeof numericValue === "number" && Number.isFinite(numericValue);
+  };
   const quickActionCounts = {
     approveDealers: coerceMetricValue(stats?.quick_actions?.pending_vendors),
     respondTickets: coerceMetricValue(stats?.quick_actions?.pending_tickets),
     viewAlerts: coerceMetricValue(stats?.quick_actions?.pending_alerts),
     generateReport: coerceMetricValue(stats?.quick_actions?.reports_ready),
   };
+  const rawTotalTyres = stats?.total_tyres;
+  const totalTyres = coerceMetricValue(rawTotalTyres);
+  const totalTyresDisplay = hasNumericValue(rawTotalTyres) ? totalTyres : "--";
+  const approvedVendorsRaw =
+    stats?.approved_vendors_last4months ??
+    getFlexibleStatValue(stats, "approved_vendors_Last4Months");
+  const approvedVendorsLast4Months = coerceMetricValue(approvedVendorsRaw);
+  const approvedVendorsLast4MonthsDisplay = hasNumericValue(approvedVendorsRaw) ? approvedVendorsLast4Months : "--";
+  const quarterArppd = coerceMetricValue(stats?.quarter_arppd);
 
   const normalizeStageKey = (raw: string) =>
     raw
@@ -139,9 +159,12 @@ export default function Dashboard() {
       setError(null);
 
       // ⬇️ Get staff_id from localStorage (persisted after login)
-      const staffId = "612dd1f0-8cd5-41f5-8b82-17cd40144e52"
+      const staffId =
 
-      //getStoredStaffId();
+
+        // "612dd1f0-8cd5-41f5-8b82-17cd40144e52"
+
+        getStoredStaffId();
       if (!staffId) {
         if (!cancelled) {
           setError("No logged-in staff found. Please log in again.");
@@ -195,15 +218,15 @@ export default function Dashboard() {
             value={
               <>
                 <h3 className="text-lg font-bold text-black">{stats?.total_listings ?? 87}</h3>
-                <span className="text-sm text-gray-700">/100</span>
+                <span className="text-sm text-gray-700">/{totalTyresDisplay}</span>
               </>
             }
             rightIconSrc={liquidityscore}
             rightIconAlt="liquidity score"
             rightIconBgClassName="bg-[#DBEAFE]"
           >
-            <div className="flex items-center gap-2">
-              <h2 className="text-sm font-semibold text-gray-700 ">Auto Spare Parts vs Tyres </h2>
+            <div className="text-sm text-gray-700">
+              <span>Auto Spare Parts Vs Tyres</span>
             </div>
           </KPIStatCard>
 
@@ -214,10 +237,6 @@ export default function Dashboard() {
             rightIconAlt="currency"
             rightIconBgClassName="bg-[#CAFFDC]"
           >
-            <div className="flex items-center gap-2 mt-2 justify-between">
-              <h2 className="text-sm font-bold text-gray-700">Parts: $18,235</h2>
-              <span className="text-sm text-gray-700">Tyres: $6,354</span>
-            </div>
             <div className="w-full bg-gray-300 rounded-full h-2 mt-3 ">
               <div className="bg-[#E9E9E9] h-2 rounded-full"></div>
             </div>
@@ -231,10 +250,9 @@ export default function Dashboard() {
             rightIconBgClassName="bg-[#F2E7FF]"
             rightIconSizeClassName="w-5 h-4"
           >
-            <div className="flex items-center gap-2">
-              <img src={arrowup} alt="arrow up" className="w-4 h-4" />
-              <h2 className="text-sm font-bold text-[#16A34A]">8.7% </h2>
-              <span className="text-sm text-gray-700">MoM growth</span>
+            <div className="flex items-center justify-between text-sm text-gray-700">
+              <span>Approved Vendors (Last 4 Months)</span>
+              <span className="font-semibold text-gray-900">{approvedVendorsLast4MonthsDisplay}</span>
             </div>
           </KPIStatCard>
 
@@ -245,10 +263,9 @@ export default function Dashboard() {
             rightIconAlt="chartbar"
             rightIconBgClassName="bg-[#FEF9C3]"
           >
-            <div className="flex items-center gap-2">
-              <img src={arrowup} alt="arrow up" className="w-4 h-4" />
-              <h2 className="text-sm font-bold text-[#16A34A]">1.2% </h2>
-              <span className="text-sm text-gray-700">vs last quarter</span>
+            <div className="flex items-center justify-between text-sm text-gray-700">
+              <span>Quarter ARPPD</span>
+              <span className="font-semibold text-gray-900">AED{quarterArppd}</span>
             </div>
           </KPIStatCard>
         </div>
@@ -331,7 +348,7 @@ export default function Dashboard() {
             </div>
 
             <div className="grid grid-col-1 md:grid-cols-2 gap-2">
-              <QuickActionItem title="Approve Dealers" iconSrc={approvedealers} count={quickActionCounts.approveDealers} />
+              <QuickActionItem title="Pending Dealers" iconSrc={approvedealers} count={quickActionCounts.approveDealers} />
               <QuickActionItem title="Respond Tickets" iconSrc={respondtickets} count={quickActionCounts.respondTickets} />
               <QuickActionItem title="View Alerts" iconSrc={viewalerts} count={quickActionCounts.viewAlerts} />
               <QuickActionItem title="Generate Report" iconSrc={generatereport} count={quickActionCounts.generateReport} />
