@@ -1,4 +1,3 @@
-import React from "react";
 import searchIcon from '../../assets/images/searchIcon2.png';
 import message from '../../assets/images/message.png';
 import notification from '../../assets/images/notification.png';

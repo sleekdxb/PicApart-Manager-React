@@ -1,4 +1,3 @@
-import React from 'react';
 import revenuerisk from "../../../../assets/images/revenue risk.png";
 
 export default function Failedpayments() {

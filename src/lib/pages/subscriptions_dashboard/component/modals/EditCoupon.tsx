@@ -7,9 +7,9 @@ interface EditCouponProps {
 const EditCoupon: React.FC<EditCouponProps> = ({ onClose }) => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const editData = Object.fromEntries(formData.entries());
     //add api logic for editing  data
+    // const formData = new FormData(e.currentTarget);
+    // const editData = Object.fromEntries(formData.entries());
     onClose();
   };
 

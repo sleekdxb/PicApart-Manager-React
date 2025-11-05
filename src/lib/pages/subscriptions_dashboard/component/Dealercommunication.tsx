@@ -1,4 +1,3 @@
-import React from 'react';
 
 import dealercommunication from "../../../../assets/images/dealer communication.png";
 import checkcircle from "../../../../assets/images/checkcircle.png";

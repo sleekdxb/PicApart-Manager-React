@@ -1,6 +1,6 @@
-import React , {useState} from 'react';
+import {useState} from 'react';
 
-import Sidebar from '../Sidebar';
+import Sidebar from '../../../components/Sidebar';
 import CommonNavbar from '../../components/CommonNavbar';
 import liquidityscore from "../../../assets/images/liquidityscore.png";
 import arrowup from "../../../assets/images/arrowup.png";

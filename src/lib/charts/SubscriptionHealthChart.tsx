@@ -1,5 +1,5 @@
 import totalmrr from '../../assets/images/total mrr.png';
-import { ComposedChart, Area, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 type SubscriptionHealthPoint = {
   month: string;
@@ -61,7 +61,7 @@ export default function SubscriptionHealthChart({ data }: SubscriptionHealthChar
 
       {/* === Chart === */}
       <ResponsiveContainer width="100%" height="90%">
-        <ComposedChart
+        <BarChart
           data={chartData}
           margin={{ top: 10, right: 30, left: 20, bottom: 0 }}
           barCategoryGap="30%"
@@ -89,9 +89,8 @@ export default function SubscriptionHealthChart({ data }: SubscriptionHealthChar
             interval={0}
           />
 
-          {/* === Single Y Axis for both === */}
+          {/* === Y Axis === */}
           <YAxis
-            yAxisId="left"
             tick={{ fontSize: 12, fill: "#6B7280" }}
             axisLine={false}
             tickLine={false}
@@ -125,26 +124,12 @@ export default function SubscriptionHealthChart({ data }: SubscriptionHealthChar
 
           {/* === Bars === */}
           <Bar
-            yAxisId="left"
             dataKey="total"
             barSize={18}
             radius={[4, 4, 0, 0]}
             fill="url(#barGradient)"
           />
-
-          {/* === Line (Total MRR) === */}
-          <Area
-            yAxisId="left" 
-            type="monotone"
-            dataKey="total"
-            stroke="#028174"
-            strokeWidth={2.5}
-            fill="none"
-            connectNulls={true}
-            dot={false}
-            activeDot={{ r: 5, fill: "#028174" }}
-          />
-        </ComposedChart>
+        </BarChart>
       </ResponsiveContainer>
     </div>
   );

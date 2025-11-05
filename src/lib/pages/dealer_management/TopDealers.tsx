@@ -1,6 +1,6 @@
-import React , {useState} from 'react';
+import {useState} from 'react';
 import { useNavigate } from 'react-router-dom';
-import Sidebar from '../Sidebar';
+import Sidebar from '../../../components/Sidebar';
 import CommonNavbar from '../../components/CommonNavbar';
 import searchIcon from "../../../assets/images/searchIcon2.png";
 

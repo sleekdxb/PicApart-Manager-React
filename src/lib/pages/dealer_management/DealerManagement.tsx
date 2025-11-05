@@ -1,6 +1,6 @@
-import React, {useState} from 'react';
+import {useState} from 'react';
  import {useNavigate} from "react-router-dom";
-import Sidebar from '../Sidebar';
+import Sidebar from '../../../components/Sidebar';
 import CommonNavbar from '../../components/CommonNavbar';
 import eyeIcon from "../../../assets/images/Eye.png";
 
@@ -99,18 +99,11 @@ export default function DealerManagement(){
         }
       };
 
-      const [currentPage, setCurrentPage] = React.useState(1);
+      const [currentPage, setCurrentPage] = useState(1);
 const itemsPerPage = 5
 const totalResults = dummyClients.length;
-const totalPages = Math.ceil(totalResults / itemsPerPage);
 const startIndex = (currentPage - 1) * itemsPerPage + 1;
 const endIndex = Math.min(currentPage * itemsPerPage, totalResults);
-
-
-const paginatedClients = dummyClients.slice(
-  (currentPage - 1) * itemsPerPage,
-  currentPage * itemsPerPage
-);
 
 const handleViewTopDealers = () => {
     navigate('/dealer-management/TopDealers'); 
