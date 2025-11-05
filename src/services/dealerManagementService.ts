@@ -82,6 +82,16 @@ export interface VendorState {
   updated_at: string;
 }
 
+export interface VendorSubStatistic {
+  login?: number | string;
+  request_part_count?: number | string;
+  total_match?: number | string;
+  chat_call_count?: number | string;
+  contact_rate?: number | string;
+  last_active?: string;
+  [key: string]: unknown;
+}
+
 export interface Vendor {
   id: number;
   acc_id: string;
@@ -116,6 +126,7 @@ export interface Vendor {
   updated_at: string;
   vendor_state?: VendorState[];
   media_files?: MediaFile[];
+  sub_statistic?: VendorSubStatistic;
 }
 
 export interface Payment {
@@ -322,6 +333,78 @@ export async function updateVendorAccountProfile(payload: UpdateVendorAccountPro
 
   const response = await authApiClient.post(endpoint, payload, token ? { headers: { Authorization: `Bearer ${token}` } } : undefined);
   try { console.log("[Dealer] Update vendor account profile response", response); } catch { }
+  return response;
+}
+
+// ====== Dealer Statistics ======
+export interface DealerStatisticsRequestItem {
+  staff_id: string;
+  sta_goal: string; // e.g., 'scoring'
+}
+
+export interface DealerActivity {
+  total_requests: number;
+  match_rate: number;
+  contact_rate: number;
+  logins: string;
+}
+
+export interface DealerScoring {
+  "Listing Quality": number;
+  "Responsiveness": number;
+  "Engagement": number;
+  "Stock Update Rate": number;
+}
+
+export interface TopDealer {
+  vendor_id: string;
+  vendor_name: string;
+  email: string;
+  activity: DealerActivity;
+  scoring: DealerScoring;
+}
+
+export interface DealerStatisticsDataItem {
+  staff_id: string;
+  goal: string;
+  top_dealers: TopDealer;
+  scoring?: DealerScoring;
+}
+
+export interface DealerStatisticsResponse {
+  status: boolean;
+  message: string;
+  data: DealerStatisticsDataItem[];
+}
+
+export async function fetchDealerStatistics(staffId: string): Promise<DealerStatisticsResponse> {
+  const endpoint = "/public/api/statistics/dashboard-statistics";
+  const token = getAuthToken();
+  const body = {
+    statistics: [
+      {
+        staff_id: staffId,
+        sta_goal: "scoring"
+      }
+    ]
+  };
+
+  try {
+    console.log("[Dealer] Fetch dealer statistics request", {
+      method: "POST",
+      url: buildApiUrl(endpoint),
+      body,
+      headers: { Authorization: token ? "Bearer ***" : undefined },
+    });
+  } catch { }
+
+  const response = await authApiClient.post<DealerStatisticsResponse>(
+    endpoint,
+    body,
+    token ? { headers: { Authorization: `Bearer ${token}` } } : undefined
+  );
+  
+  try { console.log("[Dealer] Fetch dealer statistics response", response); } catch { }
   return response;
 }
 

@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../../../components/Sidebar';
 import CommonNavbar from '../../../components/CommonNavbar';
@@ -14,14 +14,19 @@ import phone from "../../../assets/images/phone.png";
 import checkcircle2 from "../../../assets/images/CheckCircle2.png";
 import quickservice from "../../../assets/images/quick service.png";
 import email from "../../../assets/images/email.png";
+import eyeIcon from "../../../assets/images/Eye.png";
 import GarageKPIStatCard from "./component/GarageKPIStatCard";
 import GarageApprovalCard from "./component/GarageApprovalCard";
+import { fetchGarageAccounts, type GarageAccount } from "../../../services/garageManagementService";
 
 
 export default function GarageManagement(){
         const navigate= useNavigate();
     const [collapsed, setCollapsed] = useState(false);
           const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+          const [garageAccounts, setGarageAccounts] = useState<GarageAccount[]>([]);
+          const [loading, setLoading] = useState(false);
+          const [error, setError] = useState<string | null>(null);
         
           const handleToggleSidebar = () => {
             if (window.innerWidth < 768) {
@@ -31,9 +36,77 @@ export default function GarageManagement(){
             }
           };
 
-          const handleViewGarageProfile =() => {
-            navigate('/garage-management/GarageProfile');
+          const handleViewGarageProfile = (garageData: { account: GarageAccount; garage: any }) => {
+            navigate('/garage-management/GarageProfile', { state: { garageData } });
         }
+
+          const handleSeeAll = () => {
+            navigate('/garage-management/AllGarages');
+          }
+
+          // Fetch garage accounts on mount
+          useEffect(() => {
+            let cancelled = false;
+            async function load() {
+              setLoading(true);
+              setError(null);
+              try {
+                const res = await fetchGarageAccounts(1, 15);
+                if (cancelled) return;
+                setGarageAccounts(res.data || []);
+              } catch (e: any) {
+                if (cancelled) return;
+                setError(e?.message || 'Failed to load garages');
+                setGarageAccounts([]);
+              } finally {
+                if (!cancelled) setLoading(false);
+              }
+            }
+            load();
+            return () => { cancelled = true; };
+          }, []);
+
+          // Helper function to get garage status
+          const getGarageStatus = (garage: any) => {
+            // If garage_state is empty, show "Approved"
+            if (!garage.garage_state || garage.garage_state.length === 0) {
+              return { 
+                text: 'Approved', 
+                className: 'text-[#16A34A] bg-[#CAFFDC]',
+                rightStatusText: 'Approved',
+                stateName: null
+              };
+            }
+            // If garage_state exists, use state_name from the latest state
+            const latestState = garage.garage_state[garage.garage_state.length - 1];
+            const stateName = latestState.state_name || 'Approved';
+            const stateCode = latestState.state_code?.toUpperCase();
+            
+            // Determine if it's approved based on state_code
+            if (stateCode === 'APPROVED' || stateCode === 'VERIFIED') {
+              return { 
+                text: 'Approved', 
+                className: 'text-[#16A34A] bg-[#CAFFDC]',
+                rightStatusText: stateName,
+                stateName
+              };
+            }
+            // For other states, show as pending
+            return { 
+              text: 'Pending', 
+              className: 'text-[#CA8A04] bg-[#FEF9C3]',
+              rightStatusText: stateName,
+              stateName
+            };
+          };
+
+          // Flatten garage accounts to get individual garages
+          const allGarages = garageAccounts.flatMap(account => 
+            (account.garage || []).map(garage => ({ account, garage }))
+          );
+
+          // Show only first 3 garages
+          const displayedGarages = allGarages.slice(0, 3);
           return (
           <div className="min-h-screen flex flex-col bg-gray-50">
                 {/* === Sidebar === */}
@@ -112,50 +185,53 @@ export default function GarageManagement(){
 
 {/* ============= garage approval section ========= */}
   <div className="mt-3 border rounded w-full p-4 shadow bg-white">
-    <div className="flex flex-row items-center gap-3  ">
-      <img src={garageApproval} alt="garage approval" className="w-4 h-4" />
-      <h3 className="text-sm font-semibold text-black">Garage Approval Workflow</h3>
+    <div className="flex flex-row items-center justify-between gap-3 mb-3">
+      <div className="flex flex-row items-center gap-3">
+        <img src={garageApproval} alt="garage approval" className="w-4 h-4" />
+        <h3 className="text-sm font-semibold text-black">Garage Approval Workflow</h3>
+      </div>
+      {!loading && (
+        <button
+          onClick={handleSeeAll}
+          className="text-sm text-[#3E38DA] hover:text-[#2d2aa8] hover:underline font-semibold cursor-pointer transition-colors px-2 py-1"
+        >
+          See More
+        </button>
+      )}
     </div>
-    <GarageApprovalCard
-      leftIconSrc={checkcircle}
-      title="AutoFix Pro Garage"
-      statusText="Approved"
-      statusClassName="text-[#16A34A] bg-[#CAFFDC]"
-      tradeLicenseIconSrc={checkcircle2}
-      locationIconSrc={location}
-      locationText="Downtown District"
-      contactIconSrc={phone}
-      contactText="Prefers phone"
-      rightStatusText="Verified"
-      onRightStatusClick={handleViewGarageProfile}
-      tags={["Engine Repair", "Transmission", "Diagnostics"]}
-    />
-    <GarageApprovalCard
-      leftIconSrc={quickservice}
-      title="Quick Service Auto"
-      statusText="Pending"
-      statusClassName="text-[#CA8A04] bg-[#FEF9C3]"
-      tradeLicenseIconSrc={quickservice}
-      locationIconSrc={location}
-      locationText="East Side"
-      contactIconSrc={email}
-      contactText="Prefers email"
-      rightStatusText="Pending Verification"
-      tags={["Oil Change", "Tire Service", "Brake Repair"]}
-    />
-    <GarageApprovalCard
-      leftIconSrc={checkcircle}
-      title="Premium Auto Care"
-      statusText="Approved"
-      statusClassName="text-[#16A34A] bg-[#CAFFDC]"
-      tradeLicenseIconSrc={checkcircle2}
-      locationIconSrc={location}
-      locationText="North Avenue"
-      contactIconSrc={phone}
-      contactText="Prefers phone"
-      rightStatusText="Verified"
-      tags={["Luxury Vehicles", "Detailing", "Performance Tuning"]}
-    />
+    {loading ? (
+      <div className="py-6 text-center text-gray-500">Loading garages...</div>
+    ) : error ? (
+      <div className="py-6 text-center text-red-600">{error}</div>
+    ) : displayedGarages.length === 0 ? (
+      <div className="py-6 text-center text-gray-500">No garages found</div>
+    ) : (
+      displayedGarages.map(({ account, garage }, index) => {
+        const status = getGarageStatus(garage);
+        const hasTradeLicense = garage.media_files && garage.media_files.length > 0;
+        const contactMethod = garage.garage_email ? 'email' : 'phone';
+        
+        return (
+          <GarageApprovalCard
+            key={`${account.acc_id}-${garage.gra_id}-${index}`}
+            leftIconSrc={status.text === 'Approved' ? checkcircle : quickservice}
+            title={garage.garage_name || 'Unnamed Garage'}
+            statusText={status.rightStatusText || status.text}
+            statusClassName={status.className}
+            tradeLicenseIconSrc={hasTradeLicense ? checkcircle2 : quickservice}
+            locationIconSrc={location}
+            locationText={garage.garage_location || `${garage.location}, ${garage.country}`}
+            contactIconSrc={contactMethod === 'email' ? email : phone}
+            contactText={`Prefers ${contactMethod}`}
+            rightStatusText={status.rightStatusText || 'Pending Verification'}
+            onRightStatusClick={() => handleViewGarageProfile({ account, garage })}
+            onEyeClick={() => handleViewGarageProfile({ account, garage })}
+            eyeIconSrc={eyeIcon}
+            tags={[]}
+          />
+        );
+      })
+    )}
   </div>
 
                 </main>

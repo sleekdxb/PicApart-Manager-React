@@ -10,6 +10,8 @@ type GarageApprovalCardProps = {
   contactText: string;
   rightStatusText: string;
   onRightStatusClick?: () => void;
+  onEyeClick?: () => void;
+  eyeIconSrc?: string;
   tags: string[];
 };
 
@@ -25,10 +27,12 @@ export default function GarageApprovalCard({
   contactText,
   rightStatusText,
   onRightStatusClick,
+  onEyeClick,
+  eyeIconSrc,
   tags,
 }: GarageApprovalCardProps) {
   return (
-    <div className="border rounded mt-3 p-2">
+    <div className="border rounded mt-3 p-2 relative">
       <div className="flex flex-row items-center justify-between gap-3 mb-4">
         <div className="flex flex-row items-center gap-2">
           <img src={leftIconSrc} alt="icon" className="w-4 h-4" />
@@ -49,11 +53,21 @@ export default function GarageApprovalCard({
         </div>
         <button onClick={onRightStatusClick} className="text-sm text-gray-700">{rightStatusText}</button>
       </div>
-      <div className="flex flex-row items-center gap-2 flex-wrap">
+      <div className="flex flex-row items-center gap-2 flex-wrap mb-6">
         {tags.map((t) => (
           <button key={t} className="px-3 py-2 border rounded-full text-[#3E38DA] bg-[#DBEAFE]">{t}</button>
         ))}
       </div>
+      {/* Eye icon positioned at bottom-right corner */}
+      {onEyeClick && eyeIconSrc && (
+        <button 
+          onClick={onEyeClick} 
+          className="absolute bottom-2 right-2 flex items-center justify-center hover:opacity-80 transition cursor-pointer"
+          title="View Garage Profile"
+        >
+          <img src={eyeIconSrc} alt="View" className="w-5 h-5" />
+        </button>
+      )}
     </div>
   );
 }

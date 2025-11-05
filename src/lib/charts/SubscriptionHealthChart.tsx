@@ -6,37 +6,38 @@ type SubscriptionHealthPoint = {
   total: number;
 };
 
-const fallbackData: SubscriptionHealthPoint[] = [
-  { month: "Jan", total: 380 },
-  { month: "Feb", total: 550 },
-  { month: "Mar", total: 580 },
-  { month: "Apr", total: 600 },
-  { month: "May", total: 680 },
-  { month: "Jun", total: 740 },
-  { month: "Jul", total: 780 },
-  { month: "Aug", total: 860 },
-  { month: "Sep", total: 940 },
-  { month: "Oct", total: 1030 },
-  { month: "Nov", total: 1100 },
-  { month: "Dec", total: 1180 },
-];
-
 interface SubscriptionHealthChartProps {
   data?: SubscriptionHealthPoint[];
 }
 
 export default function SubscriptionHealthChart({ data }: SubscriptionHealthChartProps) {
-  const chartData = (data?.length ? data : fallbackData).map((entry) => ({
-    ...entry,
-    monthLabel: entry.month,
-  }));
+  // Only use data if it exists and has valid entries
+  const hasValidData = data && data.length > 0 && data.some((entry) => entry.total > 0);
+  
+  // If no valid data, create empty data points with default months and value 0
+  let chartData: Array<{ month: string; total: number; monthLabel: string }>;
+  if (!hasValidData) {
+    const defaultMonths = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    chartData = defaultMonths.map((month) => ({
+      month,
+      total: 0,
+      monthLabel: month,
+    }));
+  } else {
+    chartData = data.map((entry) => ({
+      ...entry,
+      monthLabel: entry.month,
+    }));
+  }
 
   const totals = chartData.map((pt) => pt.total).filter((value) => Number.isFinite(value));
   const minTotal = totals.length ? Math.min(...totals) : 0;
-  const maxTotal = totals.length ? Math.max(...totals) : 1000;
-  const yPadding = totals.length ? Math.max(20, Math.round((maxTotal - minTotal) * 0.1)) : 200;
-  const domainMin = Math.max(0, Math.floor((minTotal - yPadding) / 10) * 10);
-  const domainMax = Math.ceil((maxTotal + yPadding) / 10) * 10 || 1000;
+  const maxTotal = totals.length ? Math.max(...totals) : 0;
+  const yPadding = totals.length ? Math.max(20, Math.round((maxTotal - minTotal) * 0.1)) : 20;
+  const domainMin = 0; // Always start from 0
+  const domainMax = maxTotal > 0 
+    ? Math.ceil((maxTotal + yPadding) / 10) * 10 
+    : 100; // Default to 100 if all values are 0
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 w-full h-80">

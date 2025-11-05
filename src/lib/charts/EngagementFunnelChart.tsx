@@ -5,25 +5,35 @@ type EngagementFunnelPoint = {
   value: number;
 };
 
-const fallbackData: EngagementFunnelPoint[] = [
-  { stage: "Requests", value: 1200 },
-  { stage: "Notified", value: 1000 },
-  { stage: "Clicks", value: 920 },
-  { stage: "Contacts", value: 720 },
-];
-
 interface EngagementFunnelChartProps {
   data?: EngagementFunnelPoint[];
 }
 
 export default function EngagementFunnelChart({ data }: EngagementFunnelChartProps) {
-  const chartData = data?.length ? data : fallbackData;
+  // Only use data if it exists and has valid entries
+  const hasValidData = data && data.length > 0 && data.some((point) => point.value > 0);
+  
+  // If no valid data, create empty data points with value 0 for all stages
+  let chartData: EngagementFunnelPoint[];
+  if (!hasValidData) {
+    chartData = [
+      { stage: "Request Part", value: 0 },
+      { stage: "Notified", value: 0 },
+      { stage: "Part Click", value: 0 },
+      { stage: "Contacts", value: 0 },
+    ];
+  } else {
+    chartData = data;
+  }
+  
   const values = chartData.map((point) => point.value).filter((val) => Number.isFinite(val));
   const minValue = values.length ? Math.min(...values) : 0;
-  const maxValue = values.length ? Math.max(...values) : 1000;
-  const padding = values.length ? Math.max(10, Math.round((maxValue - minValue) * 0.1)) : 200;
-  const domainMin = Math.max(0, Math.floor((minValue - padding) / 10) * 10);
-  const domainMax = Math.ceil((maxValue + padding) / 10) * 10 || 1000;
+  const maxValue = values.length ? Math.max(...values) : 0;
+  const padding = values.length ? Math.max(10, Math.round((maxValue - minValue) * 0.1)) : 10;
+  const domainMin = 0; // Always start from 0
+  const domainMax = maxValue > 0 
+    ? Math.ceil((maxValue + padding) / 10) * 10 
+    : 100; // Default to 100 if all values are 0
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 w-full h-80">
